@@ -1,6 +1,9 @@
 import streamlit as st
 import subprocess
-import torch
+# Install necessary libraries
+with st.spinner("Installing dependencies..."):
+    subprocess.run(["pip", "install", "-U", "torch", "transformers", "accelerate", "datasets", "bertviz", "umap-learn", "seaborn"])
+
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from sklearn.metrics import accuracy_score, f1_score
