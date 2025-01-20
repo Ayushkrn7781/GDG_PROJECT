@@ -1,28 +1,38 @@
 import streamlit as st
 import subprocess
-# Install necessary libraries
-with st.spinner("Installing dependencies..."):
-    subprocess.run(["pip", "install", "-U", "torch", "transformers", "accelerate", "datasets", "bertviz", "umap-learn", "seaborn"])
+import sys
 
+# Function to install missing libraries
+# Function to install missing libraries
+def install_if_missing(package):
+    try:
+        __import__(package)
+    except ImportError:
+        subprocess.run([sys.executable, "-m", "pip", "install", package])
+
+# Install necessary dependencies
+with st.spinner("Checking dependencies..."):
+    for package in ["torch", "transformers", "accelerate", "datasets", "bertviz", "umap-learn", "seaborn"]:
+        install_if_missing(package)
+
+
+# Import libraries after installation
+import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from sklearn.metrics import accuracy_score, f1_score
 
-# Install necessary libraries
-with st.spinner("Installing dependencies..."):
-    subprocess.run(["pip", "install", "-U", "transformers", "accelerate", "datasets", "bertviz", "umap-learn", "seaborn"])
-
 # Streamlit app title
 st.title("IMDB Sentiment Analysis with BERT")
 
-# Load dataset
+# Load dataset with caching to avoid reloading
 @st.cache_data()
 def load_data():
     return load_dataset("imdb")
 
 imdb_data = load_data()
 
-# Select sample size
+# Sidebar: Select sample size
 sample_size = st.sidebar.slider("Select Sample Size", min_value=100, max_value=1000, value=250, step=50)
 train_subset = imdb_data["train"].shuffle(seed=42).select(range(sample_size))
 test_subset = imdb_data["test"].shuffle(seed=42).select(range(sample_size))
@@ -74,7 +84,9 @@ trainer = Trainer(
     compute_metrics=compute_metrics
 )
 
+# Train model when button is clicked
 if st.button("Train Model"):
-    with st.spinner("Training in progress..."):
+    with st.spinner("Training in progress... This may take a while ⏳"):
         trainer.train()
-    st.success("Training Completed!")
+    st.success("🎉 Training Completed! Model is ready.")
+
