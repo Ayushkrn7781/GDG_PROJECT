@@ -7,8 +7,11 @@ Original file is located at
     https://colab.research.google.com/drive/1sZxvI3VPxxX9RcMT1IKy28yOQkuU6OEd
 """
 
-!pip uninstall -y triton
-!pip install triton
+import subprocess
+
+subprocess.run(["pip", "uninstall", "-y", "triton"])
+subprocess.run(["pip", "install", "triton"])
+
 
 !pip install -U transformers accelerate datasets bertviz umap-learn seaborn
 
